@@ -1,10 +1,15 @@
 package com.example.dexterdemo
 
 import android.Manifest
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -54,7 +59,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                             Toast.makeText(applicationContext, "All permission granted", Toast.LENGTH_SHORT).show()
                         }
                         if(report!!.isAnyPermissionPermanentlyDenied){
-                            Toast.makeText(applicationContext, "permission denied permenantly", Toast.LENGTH_SHORT).show()
+                            //Toast.makeText(applicationContext, "permission denied permenantly", Toast.LENGTH_SHORT).show()
+                            showDialogue()
                         }
                     }
 
@@ -86,5 +92,39 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
 
                 }).check()
+
+
     }
+
+    //open setting activity
+    private fun openAppSettings(){
+        var intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        var uri = Uri.fromParts("package", packageName, null)
+        intent.setData(uri)
+        startActivityForResult(intent, 101)
+    }
+
+    //show dialogue
+
+    private fun showDialogue(){
+        var builder = AlertDialog.Builder(this)
+        builder.setTitle("Need Permission")
+        builder.setMessage("Please give us permission")
+        builder.setPositiveButton("Go to Setting", object:DialogInterface.OnClickListener{
+            override fun onClick(dialogue: DialogInterface?, p1: Int) {
+                dialogue?.dismiss()
+                openAppSettings()
+            }
+
+        })
+        builder.setNegativeButton("Cancel", object:DialogInterface.OnClickListener{
+            override fun onClick(dialogue: DialogInterface?, p1: Int) {
+                dialogue?.dismiss()
+            }
+
+        })
+        builder.show()
+    }
+
+
 }
